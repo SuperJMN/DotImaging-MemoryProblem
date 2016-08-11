@@ -9,6 +9,8 @@
         private readonly ZipArchiveEntry[] allImages;
         private readonly ZipArchive zipArchive;
 
+        private IImage currentImage;
+
         public ZipCapture(ZipArchive zipArchive)
         {
             this.zipArchive = zipArchive;
@@ -29,10 +31,18 @@
             {
                 var buffer = new byte[length];
                 stream.Read(buffer, 0, (int) length);
-                image = buffer.DecodeAsColorImage().Lock();
+
+                DisposePreviousFrameIfAny();
+                currentImage = buffer.DecodeAsColorImage().Lock();
             }
 
+            image = currentImage;
             return true;
+        }
+
+        private void DisposePreviousFrameIfAny()
+        {
+            currentImage?.Dispose();
         }
 
         public override void Open()
@@ -42,6 +52,7 @@
 
         public override void Close()
         {
+            DisposePreviousFrameIfAny();
             zipArchive.Dispose();
         }
     }
