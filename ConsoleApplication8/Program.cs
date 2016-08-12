@@ -2,6 +2,7 @@
 {
     using System.IO;
     using System.IO.Compression;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using Bravent.FaceRecAzure.Services.Picasso;
@@ -24,20 +25,15 @@
 
         public static async Task Identify()
         {
-            var sources = new[] { "ZippedImages-Lite-1.zip", "ZippedImages-Lite-2.zip" };
-            var identificator = new BatchIdentificator(new ImageIdentificator(new AutoRetryFaceClient(new FaceServiceClient("______REPLACE_ME_WITH_API_KEY_____"))));
+            var identificator = new BatchIdentificator(new ImageIdentificator(new AutoRetryFaceClient(new FaceServiceClient("____REPLACE_ME_WITH_API_KEY____"))));
+            
+            var identifications = Observable.Using(() => CreateCapture("ZippedImages-Lite-1.zip"),
+                capture =>
+                {
+                    return identificator.Identify(capture.ToObservable(), (i, idents) => new { i, idents });
+                });
 
-            var result = sources
-                .ToObservable()
-                .SelectMany(
-                    path =>
-                        Observable.Using(() => CreateCapture(path),
-                            capture =>
-                            {
-                                return identificator.Identify(capture.ToObservable(), (i, idents) => new {i, idents});
-                            }));
-
-            await result.ToList();
+            await identifications.ToList();           
         }
 
         private static ZipCapture CreateCapture(string path)
