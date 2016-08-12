@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "ConsoleApplication8\Sample.csproj", "{FF067B72-C4BC-4A9B-BA3D-8BFAD156BACE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceAPI.Utils", "..\BatchIdentificator\FaceAPI.Utils\FaceAPI.Utils.csproj", "{5334D0CC-BC62-4B24-B4B8-991E858392A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FF067B72-C4BC-4A9B-BA3D-8BFAD156BACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF067B72-C4BC-4A9B-BA3D-8BFAD156BACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF067B72-C4BC-4A9B-BA3D-8BFAD156BACE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5334D0CC-BC62-4B24-B4B8-991E858392A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5334D0CC-BC62-4B24-B4B8-991E858392A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5334D0CC-BC62-4B24-B4B8-991E858392A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5334D0CC-BC62-4B24-B4B8-991E858392A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

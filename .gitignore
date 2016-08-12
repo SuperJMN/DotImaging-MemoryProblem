@@ -243,3 +243,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/ConsoleApplication8/FaceApiClient.cs

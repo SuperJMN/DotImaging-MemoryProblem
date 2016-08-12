@@ -27,15 +27,15 @@
         {
             var zipArchiveEntry = allImages[Position];
             var length = zipArchiveEntry.Length;
+            var buffer = new byte[length];
+
             using (var stream = zipArchiveEntry.Open())
             {
-                var buffer = new byte[length];
                 stream.Read(buffer, 0, (int) length);
-
-                DisposePreviousFrameIfAny();
-                currentImage = buffer.DecodeAsColorImage().Lock();
             }
 
+            DisposePreviousFrameIfAny();
+            currentImage = buffer.DecodeAsColorImage().Lock();
             image = currentImage;
             return true;
         }

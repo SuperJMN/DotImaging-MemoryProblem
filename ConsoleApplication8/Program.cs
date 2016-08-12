@@ -4,29 +4,45 @@
     using System.IO.Compression;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using DotImaging;
+    using Bravent.FaceRecAzure.Services.Picasso;
+    using FaceAPI.Utils;
+    using Microsoft.ProjectOxford.Face;
     using Nito.AsyncEx;
+    using Serilog;
 
     class Program
     {
         static void Main()
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.LiterateConsole()
+                .MinimumLevel.Debug()
+                .CreateLogger();
+
             AsyncContext.Run(Identify);
         }
 
         public static async Task Identify()
         {
-            // LOW MEMORY CONSUMPTION
-            //var images =  new FileCapture("http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4");
+            var sources = new[] { "ZippedImages-Lite-1.zip", "ZippedImages-Lite-2.zip" };
+            var identificator = new BatchIdentificator(new ImageIdentificator(new AutoRetryFaceClient(new FaceServiceClient("______REPLACE_ME_WITH_API_KEY_____"))));
 
-            // HUGE MEMORY CONSUMPTION!!!!
-            var images = new ZipCapture(new ZipArchive(new FileStream("ZippedImages.zip", FileMode.Open)));
+            var result = sources
+                .ToObservable()
+                .SelectMany(
+                    path =>
+                        Observable.Using(() => CreateCapture(path),
+                            capture =>
+                            {
+                                return identificator.Identify(capture.ToObservable(), (i, idents) => new {i, idents});
+                            }));
 
-            var processor = new SizeRetriever();
-            var ids = processor.ImageSizeRetriever(images.ToObservable());
+            await result.ToList();
+        }
 
-            await ids.ToList();
-            images.Dispose();
-        }       
+        private static ZipCapture CreateCapture(string path)
+        {
+            return new ZipCapture(new ZipArchive(File.OpenRead(path)));
+        }
     }
 }
