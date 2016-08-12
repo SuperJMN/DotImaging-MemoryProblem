@@ -30,7 +30,7 @@
             var identifications = Observable.Using(() => CreateCapture("ZippedImages-Lite-1.zip"),
                 capture =>
                 {
-                    return identificator.Identify(capture.ToObservable(), (i, idents) => new { i, idents });
+                    return identificator.Identify(capture.ToObservable(new EventLoopScheduler()), (i, idents) => new { i, idents });
                 });
 
             await identifications.ToList();           
