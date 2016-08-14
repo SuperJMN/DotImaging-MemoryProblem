@@ -5,7 +5,7 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using Bravent.FaceRecAzure.Services.Picasso;
+    using DotImaging;
     using FaceAPI.Utils;
     using Microsoft.ProjectOxford.Face;
     using Nito.AsyncEx;
@@ -35,13 +35,13 @@
                         Observable.Using(() => CreateCapture(path),
                             capture =>
                             {
-                                return identificator.Identify(capture.ToObservable(), (i, idents) => new { i, idents });
+                                return identificator.Identify(capture.ToObservable(new EventLoopScheduler()), (i, idents) => new { i, idents });
                             }));
 
             await identifications.ToList();
         }
 
-        private static ZipCapture CreateCapture(string path)
+        private static ImageStreamReader CreateCapture(string path)
         {
             return new ZipCapture(new ZipArchive(File.OpenRead(path)));
         }

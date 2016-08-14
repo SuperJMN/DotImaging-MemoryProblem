@@ -11,11 +11,13 @@
 
         private IImage currentImage;
 
+        readonly object syncObj = new object();
+
         public ZipCapture(ZipArchive zipArchive)
         {
             this.zipArchive = zipArchive;
             var allImagesEnumerable = from entry in zipArchive.Entries
-                select entry;
+                                      select entry;
             allImages = allImagesEnumerable.ToArray();
         }
 
@@ -25,18 +27,30 @@
 
         protected override bool ReadInternal(out IImage image)
         {
-            var zipArchiveEntry = allImages[Position];
-            var length = zipArchiveEntry.Length;
-            var buffer = new byte[length];
-
-            using (var stream = zipArchiveEntry.Open())
+            lock (syncObj)
             {
-                stream.Read(buffer, 0, (int) length);
+                image = default(IImage);
+
+                if (Position >= allImages.Length)
+                {
+                    return false;
+                }
+
+                var zipArchiveEntry = allImages[Position];
+
+                var length = zipArchiveEntry.Length;
+                var buffer = new byte[length];
+
+                using (var stream = zipArchiveEntry.Open())
+                {
+                    stream.Read(buffer, 0, (int)length);
+                }
+
+                DisposePreviousFrameIfAny();
+                currentImage = buffer.DecodeAsColorImage().Lock();
+                image = currentImage;
             }
 
-            DisposePreviousFrameIfAny();
-            currentImage = buffer.DecodeAsColorImage().Lock();
-            image = currentImage;
             return true;
         }
 
